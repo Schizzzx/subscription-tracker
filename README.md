@@ -84,6 +84,6 @@ GET     /api/subscriptions/<id>/
 PUT     /api/subscriptions/<id>/
 DELETE  /api/subscriptions/<id>/
 
--Summary
+- Summary
 GET /api/summary/
 
