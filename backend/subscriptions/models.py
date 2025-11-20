@@ -2,22 +2,52 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Category(models.Model):
+    """
+    Subscription category, e.g.:
+    - Entertainment
+    - Music
+    - Cloud Storage
+    - Utilities
+    etc.
+    """
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    icon = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Icon name or path used on frontend (optional).",
+    )
+    color = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="Optional color code for UI, e.g. #FF0000 or 'red'.",
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class Subscription(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='subscriptions',
+    )
+
     name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=10, default='EUR')
-    billing_period = models.CharField(
-        max_length=20,
-        choices=[
-            ('monthly', 'Monthly'),
-            ('yearly', 'Yearly'),
-            ('weekly', 'Weekly'),
-        ]
-    )
+    billing_period = models.CharField(max_length=20, choices=[
+        ('monthly', 'Monthly'),
+        ('yearly', 'Yearly'),
+        ('weekly', 'Weekly'),
+    ])
     next_payment_date = models.DateField()
     is_active = models.BooleanField(default=True)
-
 
     has_trial = models.BooleanField(default=False)
     trial_end_date = models.DateField(null=True, blank=True)
@@ -49,12 +79,12 @@ class FriendRequest(models.Model):
     from_user = models.ForeignKey(
         User,
         related_name='sent_requests',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     to_user = models.ForeignKey(
         User,
         related_name='received_requests',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
 
     status = models.CharField(
@@ -64,7 +94,7 @@ class FriendRequest(models.Model):
             ('accepted', 'Accepted'),
             ('rejected', 'Rejected'),
         ],
-        default='pending'
+        default='pending',
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
