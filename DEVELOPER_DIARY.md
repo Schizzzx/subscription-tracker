@@ -164,45 +164,67 @@ Tested and verified.
   - Notification settings remain single-per-user.
   - Users cannot change ownership on any resource.
 
----
+## Day 5 — Pagination & API Contract (v1)
 
-## ✔ Current Backend Status (Stable v1)
+### ✔ Global Pagination Enabled
 
-- JWT authentication  
-- Session authentication  
-- Per-user data isolation  
-- Subscription CRUD  
-- Subscription uniqueness enforcement  
-- Trial system  
-- Summary totals  
-- Notification settings (with upsert)  
-- Friends system  
-- Common subscriptions detection  
-- Ownership protection for all models
+- Enabled global DRF pagination:
+  - DEFAULT_PAGINATION_CLASS = PageNumberPagination
+  - PAGE_SIZE = 10
+- Pagination now applies to all list endpoints:
+  - GET /api/subscriptions/
+  - GET /api/friends/
+  - GET /api/notification-settings/
 
-Backend is now stable, consistent, and ready for frontend integration.
+Example paginated response:
 
----
-
-## TODO — Future Development Roadmap
-
-### Backend Improvements
-- Pagination for subscription and friend list endpoints.
-- Celery-based notification scheduler (email + push reminders).
-- Service categories.
-- Service logos (icons for Netflix, Spotify, YouTube, etc.).
-- Audit log for subscription changes.
-- Soft deletion for subscriptions (optional).
-
-### Nice-to-Have Features
-- Import subscriptions from Google Play / App Store.
-- OCR for bank statements.
-- CSV export.
-- Cost forecasting.
-- Dark/light mode for web & mobile.
+```json
+{
+  "count": 23,
+  "next": "http://localhost:8000/api/subscriptions/?page=2",
+  "previous": null,
+  "results": [
+    { "... paginated objects ..." }
+  ]
+}
+```
 
 ---
 
-## Notes
-я ненавижу сведбанк!
+### ✔ API Specification Document (API_SPEC.md)
+
+- Added file: `backend/API_SPEC.md`
+- This document defines API v1, including:
+
+  **Authentication**
+  - `/api/token/`
+  - `/api/token/refresh/`
+  - `/api-auth/login/`
+
+  **Subscriptions**
+  - Full CRUD endpoints
+  - Trial logic in summary calculations
+  - Unique per-user service name rules
+  - `/api/summary/` endpoint with normalized totals
+
+  **Notification Settings**
+  - One-to-One per user
+  - POST now acts as UPSERT (create or update automatically)
+
+  **Friends System**
+  - Sending friend requests
+  - Accept / reject workflow
+  - Unique user-pair constraint
+  - Pagination enabled for listing
+
+  **Common Subscriptions**
+  - Case-insensitive matching
+  - Shared plan savings suggestions
+
+- This file is now the official API contract used for future frontend (web/mobile).
+- Any breaking changes must be coordinated with the frontend or moved to API v2.
+
+---
+
+я решил сюда больше не записывать идеи и статус. 
 
