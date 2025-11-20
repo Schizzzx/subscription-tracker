@@ -1,11 +1,15 @@
 ### will create it later
 
 ---
+## cd ~/Desktop/subscription-tracker
 
 - git status
 - git add
 - git commit -m ""
 - git push
+
+- git stash
+- git pull origin main
 
 - git fetch
 - git pull
@@ -14,7 +18,6 @@
 
 - python manage.py migrate
 - pip install -r requirements.txt
-
 
 ---
 
