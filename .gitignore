@@ -1,0 +1,50 @@
+# ---- Python ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.log
+
+# ---- Virtual environment ----
+venv/
+env/
+.venv/
+
+# ---- Django ----
+*.sqlite3
+db.sqlite3
+/media/
+staticfiles/
+static/
+*.mo
+*.pot
+
+# ---- Migrations (cache only) ----
+*/migrations/__pycache__/
+
+# Keep migrations themselves
+# (We do NOT ignore migration .py files!)
+
+# ---- macOS ----
+.DS_Store
+
+# ---- JetBrains / PyCharm ----
+.idea/
+
+# ---- Visual Studio Code ----
+.vscode/
+
+# ---- OS files ----
+Thumbs.db
+ehthumbs.db
+
+# ---- Backup ----
+*.bak
+*.old
+
+# ---- Environment variables ----
+.env
+.env.*
