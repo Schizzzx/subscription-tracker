@@ -205,7 +205,6 @@ Create a new subscription for the authenticated user.
 {
   "name": ["You already have a subscription with this name."]
 }
-```
 
 ---
 
