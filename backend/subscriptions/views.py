@@ -1,7 +1,7 @@
 from datetime import date
 
 from django.db.models import Q
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -13,23 +13,20 @@ from .serializers import (
 )
 
 
-
-
 class SubscriptionViewSet(viewsets.ModelViewSet):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        
         return Subscription.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        
         serializer.save(user=self.request.user)
 
-
-
+    def perform_update(self, serializer):
+        
+        serializer.save(user=self.request.user)
 
 
 class SummaryView(APIView):
@@ -68,8 +65,6 @@ class SummaryView(APIView):
         return Response(data)
 
 
-
-
 class NotificationSettingsViewSet(viewsets.ModelViewSet):
     queryset = NotificationSettings.objects.all()
     serializer_class = NotificationSettingsSerializer
@@ -79,18 +74,33 @@ class NotificationSettingsViewSet(viewsets.ModelViewSet):
         return NotificationSettings.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
+       
         serializer.save(user=self.request.user)
 
+    def perform_update(self, serializer):
+        
+        serializer.save(user=self.request.user)
 
+    def create(self, request, *args, **kwargs):
+        instance = NotificationSettings.objects.filter(user=request.user).first()
+
+        if instance is not None:
+            
+            serializer = self.get_serializer(instance, data=request.data, partial=False)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        
+        return super().create(request, *args, **kwargs)
 
 
 class FriendRequestViewSet(viewsets.ModelViewSet):
-    queryset = FriendRequest.objects.all()    
+    queryset = FriendRequest.objects.all()
     serializer_class = FriendRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        
         return FriendRequest.objects.filter(
             Q(from_user=self.request.user) | Q(to_user=self.request.user)
         )
@@ -99,14 +109,12 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
         serializer.save(from_user=self.request.user)
 
 
-
 class CommonSubscriptionsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         user = request.user
 
-        
         accepted = FriendRequest.objects.filter(
             Q(from_user=user) | Q(to_user=user),
             status='accepted',
@@ -126,14 +134,13 @@ class CommonSubscriptionsView(APIView):
 
             for s1 in my_subs:
                 for s2 in f_subs:
-                    
                     if s1.name.strip().lower() == s2.name.strip().lower():
                         results.append({
                             "friend": friend.username,
                             "service": s1.name,
                             "you_pay": float(s1.price),
                             "friend_pays": float(s2.price),
-                            "suggestion": "Consider using a shared or family plan to reduce costs."
+                            "suggestion": "Consider using a shared or family plan to reduce costs.",
                         })
 
         return Response(results)

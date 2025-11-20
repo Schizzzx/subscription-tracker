@@ -23,20 +23,20 @@ A structured development log documenting the backend and API progress of the Sub
 - Implemented base `Subscription` model:
   - `user` (FK)
   - `name`, `price`, `currency`
-  - `billing_period` (monthly / yearly / weekly)
+  - `billing_period` (`monthly`, `yearly`, `weekly`)
   - `next_payment_date`
   - `is_active`
 - Implemented CRUD API using DRF `ModelViewSet`.
 - Implemented `SubscriptionSerializer`.
 - Added `/api/subscriptions/` endpoint via DRF router.
 - Added `/api/summary/` endpoint with:
-  - monthly total
-  - yearly total
+  - monthly total  
+  - yearly total  
   - subscription count
 - Created admin test user:
   - username: `admin`
   - password: `cocacola`
-- Added initial test data (Netflix subscriptions).
+- Added initial test data.
 - First GitHub push completed.
 
 ---
@@ -53,146 +53,156 @@ A structured development log documenting the backend and API progress of the Sub
   - `JWTAuthentication`
   - `SessionAuthentication`
 - Enabled browser login via `/api-auth/login/`.
-- Applied global `IsAuthenticated` permission.
-- Implemented strict user data isolation:
-  - `get_queryset()` filters by current user.
-  - `perform_create()` assigns `user=request.user`.
-  - `user` field set to read-only.
-- Protected summary API (`/api/summary/`).
-- Successfully tested:
-  - JWT authentication
-  - Session login
-  - Proper 401 responses
-  - User-specific subscription listing
-  - User-specific summary totals
+- Applied global `IsAuthenticated`.
+- Enforced strict user data isolation:
+  - `get_queryset()` filters only the current user’s data.
+  - `perform_create()` automatically assigns `user=request.user`.
+  - Declared `user` field as read-only in serializers.
+- Protected `/api/summary/` with authentication.
+- Fully tested JWT + Session login + isolation behavior.
 
-**Backend now has proper authentication and isolation.**
+**Backend now has robust authentication and strict per-user data separation.**
 
 ---
 
 ## Day 3 — Trials, Notifications, Friends, and Common Subscriptions
 
-### ✔ 1. Trials System Implemented
+### ✔ Trials System Implemented
 
-New fields in subscription model:
+Added trial-related fields to `Subscription`:
 - `has_trial`
 - `trial_end_date`
 - `auto_renews`
 
-Summary now excludes subscriptions still in trial.
+Updated Summary API:
+- Excludes subscriptions still in trial.
 
 Tested:
-- Trial field saves correctly
-- Summary ignores trial subscriptions
-- Normal subscriptions counted as expected
+- Trial fields save correctly.
+- Summary logic behaves as expected.
 
 ---
 
-### ✔ 2. Notification Settings Added
+### ✔ Notification Settings (Initial Version)
 
-New model:  
+Model:
 - `days_before`
 - `email_enabled`
 - `push_enabled`
-- Auto-bound to current user
+- One-to-One with `User`
 
 Endpoint:
 - `/api/notification-settings/`
 
-Tested:
-- Settings create and save properly
-- Bound to user
-- Appears in DRF UI
+Tested basic creation and isolation.
 
 ---
 
-### ✔ 3. Friends System Implemented
+### ✔ Friends System Implemented
 
-New model:
+Model:
 - `from_user`
 - `to_user`
-- `status` (`pending`, `accepted`, `declined`)
+- `status` (`pending`, `accepted`, `rejected`)
 - `created_at`
 
 Features:
-- Users can send friend requests
-- Both sides see the request
-- Requests can be accepted/declined via PATCH
+- Users can send friend requests.
+- Requests visible to both sides.
+- Accept/decline via PATCH.
 
 Endpoints:
 - `/api/friends/`
 - `/api/friends/<id>/`
 
-Tested:
-- Sending request ✔  
-- Accepting request ✔  
-- Status updates ✔  
-
 ---
 
-### ✔ 4. Common Subscriptions Feature
+### ✔ Common Subscriptions Feature
 
 Endpoint:
 - `/api/common/`
 
 Logic:
-- Only works if friendship = `accepted`
-- Compares active subscriptions
-- Case-insensitive service matching
-- Returns suggestions (e.g. share plan to save money)
+- Works only when friendship is accepted.
+- Case-insensitive subscription name matching.
+- Returns suggestions for shared/family plans.
 
-Tested:
-- Works when both users have matching subscriptions
-- Empty array if no matches or no accepted friendship
+Tested and verified.
 
 ---
 
-## ✔ Current Backend Status
+## Day 4 — Data Integrity, Ownership Hardening & Notification Settings Upsert
 
-Everything below is **implemented and working:**
+### ✔ 1. Unique Subscriptions Per User
+
+- Added database-level `UniqueConstraint(user, name)` in the `Subscription` model.
+- Cleaned legacy duplicate rows in SQLite before migration.
+- Implemented duplicate detection in the `SubscriptionSerializer`:
+  - User-friendly 400 error before DB-level constraint triggers.
+- Added `perform_update()` in `SubscriptionViewSet` to enforce:
+  - `user=request.user` on all updates.
+
+### ✔ 2. Ownership Protection Improvements
+
+- Both `Subscription` and `NotificationSettings` explicitly prevent any user tampering via API payload.
+- User assignment is enforced exclusively through backend logic.
+
+### ✔ 3. Notification Settings — Upsert Behavior
+
+**New behavior:**
+
+- `POST /api/notification-settings/` now acts as **UPSERT**:
+  - If user has no settings → create.
+  - If settings exist → update them (200 OK).
+- Makes frontend integration significantly simpler (no need for conditional logic).
+
+### ✔ 4. Cleanup & Stability
+
+- Removed duplicate `Subscription` rows before applying constraints.
+- Verified that:
+  - Duplicate subscriptions cannot be created.
+  - Notification settings remain single-per-user.
+  - Users cannot change ownership on any resource.
+
+---
+
+## ✔ Current Backend Status (Stable v1)
 
 - JWT authentication  
 - Session authentication  
-- User isolation  
+- Per-user data isolation  
 - Subscription CRUD  
-- Summary totals  
+- Subscription uniqueness enforcement  
 - Trial system  
-- Notification settings  
+- Summary totals  
+- Notification settings (with upsert)  
 - Friends system  
-- Common subscription detection  
+- Common subscriptions detection  
+- Ownership protection for all models
 
-The backend is now structurally solid and ready for further expansion or frontend integration.
+Backend is now stable, consistent, and ready for frontend integration.
 
 ---
 
 ## TODO — Future Development Roadmap
 
-###  Backend Improvements
+### Backend Improvements
+- Pagination for subscription and friend list endpoints.
+- Celery-based notification scheduler (email + push reminders).
+- Service categories.
+- Service logos (icons for Netflix, Spotify, YouTube, etc.).
+- Audit log for subscription changes.
+- Soft deletion for subscriptions (optional).
 
-- Prevent duplicate subscription entries for same service per user.
-- Prevent users from setting others as subscription owners.
-- Prevent duplicate notification settings.
-- Add Celery-based notification scheduler (emails + push).
-- Add pagination.
-- Add service categories (optional).
-- Add service logos (Netflix, Spotify, YouTube, etc.).
-- Add audit log (history of changes).
-
----
-
-###  Nice-to-Have Features
-
+### Nice-to-Have Features
 - Import subscriptions from Google Play / App Store.
 - OCR for bank statements.
 - CSV export.
 - Cost forecasting.
-- Web & mobile themes (dark/light mode).
+- Dark/light mode for web & mobile.
 
 ---
 
 ## Notes
-
-пока все(
-
----
+я ненавижу сведбанк!
 
