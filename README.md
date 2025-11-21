@@ -33,22 +33,25 @@
 
 ---
 
-http://127.0.0.1:8000/api//
--
-http://127.0.0.1:8000/api/subscriptions/
-http://127.0.0.1:8000/api/summary/
--
-http://127.0.0.1:8000/api/friends/
-http://127.0.0.1:8000/api/common/
+- `http://127.0.0.1:8000/api//`
 
--
-http://127.0.0.1:8000/api/token/
-http://127.0.0.1:8000/api/token/refresh/
--
-http://127.0.0.1:8000/api-auth/login/
-http://127.0.0.1:8000/api-auth/logout/
--
-http://127.0.0.1:8000/api/notification-settings/
+- `http://127.0.0.1:8000/api/subscriptions/`
+- `http://127.0.0.1:8000/api/summary/`
+
+
+- `http://127.0.0.1:8000/api/friends/`
+- `http://127.0.0.1:8000/api/common/`
+
+
+- `http://127.0.0.1:8000/api/token/`
+- `http://127.0.0.1:8000/api/token/refresh/`
+
+
+- `http://127.0.0.1:8000/api-auth/login/`
+- `http://127.0.0.1:8000/api-auth/logout/`
+
+
+- `http://127.0.0.1:8000/api/notification-settings/`
 
 
 
