@@ -4,7 +4,7 @@ A structured development log documenting the backend and API progress of the Sub
 
 ---
 
-## Day 1 — Backend Initialization
+## v1.0 — Backend Initialization
 
 ### ✔ Done
 
@@ -41,7 +41,7 @@ A structured development log documenting the backend and API progress of the Sub
 
 ---
 
-## Day 2 — Authentication, Permissions and User Isolation
+## v1.1 — Authentication, Permissions and User Isolation
 
 ### ✔ Done
 
@@ -65,7 +65,7 @@ A structured development log documenting the backend and API progress of the Sub
 
 ---
 
-## Day 3 — Trials, Notifications, Friends, and Common Subscriptions
+## v1.2 — Trials, Notifications, Friends, and Common Subscriptions
 
 ### ✔ Trials System Implemented
 
@@ -131,7 +131,7 @@ Tested and verified.
 
 ---
 
-## Day 4 — Data Integrity, Ownership Hardening & Notification Settings Upsert
+## v1.3 — Data Integrity, Ownership Hardening & Notification Settings Upsert
 
 ### ✔ 1. Unique Subscriptions Per User
 
@@ -164,7 +164,7 @@ Tested and verified.
   - Notification settings remain single-per-user.
   - Users cannot change ownership on any resource.
 
-## Day 5 — Pagination & API Contract (v1)
+## v1.4 — Pagination & API Contract (v1)
 
 ### ✔ Global Pagination Enabled
 
